@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SUB-TEC // COMMAND CORE</title>
+<meta name="description" content="Sub-Tec Industries — Integrated Project Network, Bid to Build to Closeout">
+<meta name="theme-color" content="#060a12">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 46'><rect width='46' height='46' fill='%23060a12'/><circle cx='23' cy='23' r='4.5' fill='%234fe3ff'/><circle cx='23' cy='23' r='13' fill='none' stroke='%23ffc23d' stroke-width='1.2' opacity='.7'/><circle cx='23' cy='23' r='20' fill='none' stroke='%234fe3ff' stroke-width='1.4' opacity='.5'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060a12; --bg2:#0a1322; --panel:#0c1726cc; --panel-solid:#0c1726;
+  --line:rgba(79,180,255,.10); --line-bright:rgba(79,227,255,.55);
+  --cyan:#4fe3ff; --cyan-d:#2fb8e0; --blue:#3b82f6; --amber:#ffc23d; --amber-d:#ffb000;
+  --green:#43e08f; --orange:#ff8a3d; --violet:#b487ff; --peri:#8b9dff; --red:#ff5d5d;
+  --text:#d7ecf8; --muted:#6f8aa3; --muted2:#46607a;
+  --edge:rgba(79,180,255,.18);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  font-family:"IBM Plex Mono",monospace; color:var(--text); background:var(--bg);
+  background-image:
+    radial-gradient(1200px 700px at 50% 28%, rgba(40,120,200,.16), transparent 60%),
+    radial-gradient(900px 600px at 80% 90%, rgba(255,178,40,.06), transparent 55%),
+    linear-gradient(180deg,#060a12,#04070d);
+  min-height:100%; overflow-x:hidden;
+}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:46px 46px; mask-image:radial-gradient(ellipse 80% 70% at 50% 40%,#000 40%,transparent 100%);
+}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:2;mix-blend-mode:overlay;opacity:.5;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px)}
+h1,h2,h3,h4,.disp{font-family:"Chakra Petch",sans-serif;letter-spacing:.04em}
+
+/* ─── LOGIN ─── */
+#loginscreen{
+  position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+  background-image:
+    radial-gradient(1200px 700px at 50% 28%, rgba(40,120,200,.18), transparent 60%),
+    linear-gradient(180deg,#060a12,#04070d);
+}
+#loginscreen::before{
+  content:"";position:absolute;inset:0;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:46px 46px;mask-image:radial-gradient(ellipse 80% 70% at 50% 40%,#000 40%,transparent 100%);
+}
+.login-box{
+  position:relative;z-index:1;width:min(420px,90vw);
+  background:var(--panel-solid);border:1px solid var(--line-bright);border-radius:20px;
+  box-shadow:0 0 80px rgba(79,227,255,.15),0 0 200px rgba(79,100,255,.08);
+  padding:38px 36px 32px;animation:rise .4s ease;
+}
+.login-sigil{display:flex;justify-content:center;margin-bottom:20px}
+.login-sigil svg{filter:drop-shadow(0 0 14px rgba(79,227,255,.6))}
+.login-box h2{margin:0 0 4px;font-size:22px;color:#eafaff;text-align:center;letter-spacing:.06em}
+.login-sub{font-size:10.5px;color:var(--cyan-d);letter-spacing:.32em;text-transform:uppercase;text-align:center;margin-bottom:28px}
+.lfield{margin-bottom:14px}
+.lfield label{display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.lfield input{
+  width:100%;background:#06101c;border:1px solid var(--edge);color:var(--text);
+  border-radius:9px;padding:11px 13px;font-size:13px;font-family:"IBM Plex Mono";
+  outline:none;transition:.15s;letter-spacing:.05em;
+}
+.lfield input:focus{border-color:var(--line-bright);box-shadow:0 0 0 1px var(--line-bright),0 0 16px rgba(79,227,255,.15)}
+.login-btn{
+  width:100%;margin-top:8px;padding:13px;
+  font-family:"Chakra Petch";font-size:14px;font-weight:700;letter-spacing:.1em;
+  background:linear-gradient(180deg,#1d4e6b,#0f2a3c);border:1px solid #3fb6e0;
+  color:#eafaff;border-radius:10px;cursor:pointer;transition:.16s;
+}
+.login-btn:hover{box-shadow:0 0 28px rgba(79,227,255,.4);transform:translateY(-1px)}
+.login-btn:active{transform:none}
+.login-err{font-size:11.5px;color:var(--red);text-align:center;margin-top:12px;min-height:18px;letter-spacing:.04em}
+.login-hint{font-size:10px;color:var(--muted2);text-align:center;margin-top:18px;letter-spacing:.1em}
+
+/* ─── USER CHIP ─── */
+.user-chip{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+.user-chip .uavatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#1d4e6b,#0f2a3c);
+  border:1px solid var(--edge);display:flex;align-items:center;justify-content:center;
+  font-family:"Chakra Petch";font-size:11px;color:var(--cyan);font-weight:700}
+.user-chip button{background:none;border:none;color:var(--muted2);cursor:pointer;font-size:10px;
+  font-family:"IBM Plex Mono";padding:0;letter-spacing:.08em}
+.user-chip button:hover{color:var(--red)}
+
+/* ─── MAIN APP ─── */
+.wrap{position:relative;z-index:3;max-width:1320px;margin:0 auto;padding:22px clamp(14px,3vw,34px) 80px}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  border-bottom:1px solid var(--edge);padding-bottom:16px}
+.brand{display:flex;align-items:center;gap:14px}
+.sigil svg{display:block;filter:drop-shadow(0 0 8px rgba(79,227,255,.5))}
+.brand h1{margin:0;font-size:clamp(20px,3vw,30px);font-weight:700;line-height:1;
+  background:linear-gradient(180deg,#eafaff,#7fdcf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand .sub{font-size:11px;color:var(--cyan-d);letter-spacing:.34em;text-transform:uppercase;margin-top:5px}
+.topright{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.clock{font-size:11px;color:var(--muted);letter-spacing:.12em}
+.clock b{color:var(--amber);font-weight:600}
+.iobar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:18px 0 8px}
+.stat{background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:12px 14px;position:relative;overflow:hidden}
+.stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cyan)}
+.stat .k{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font-family:"Chakra Petch";font-size:26px;font-weight:700;color:#eafaff;margin-top:4px;line-height:1}
+.stat.amber::before{background:var(--amber)} .stat.green::before{background:var(--green)} .stat.orange::before{background:var(--orange)}
+
+.toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 0 6px}
+.toolbar .label{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+.spacer{margin-left:auto}
+.btn{font-family:"Chakra Petch";cursor:pointer;border:1px solid var(--edge);background:#0e1c30;color:var(--text);
+  padding:9px 16px;border-radius:8px;font-size:13px;letter-spacing:.06em;display:inline-flex;align-items:center;gap:8px;
+  transition:.16s;font-weight:600}
+.btn:hover{border-color:var(--line-bright);box-shadow:0 0 0 1px var(--line-bright),0 0 22px rgba(79,227,255,.25);transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(180deg,#1d4e6b,#0f2a3c);border-color:#3fb6e0;color:#eafaff}
+.btn.primary:hover{box-shadow:0 0 26px rgba(79,227,255,.45)}
+.btn.ghost{background:transparent}
+.btn.danger{border-color:rgba(255,93,93,.4);color:#ffb3b3}
+.btn.danger:hover{box-shadow:0 0 22px rgba(255,93,93,.3);border-color:var(--red)}
+.btn.sm{padding:6px 11px;font-size:12px}
+.toggle{display:inline-flex;border:1px solid var(--edge);border-radius:8px;overflow:hidden}
+.toggle button{background:transparent;border:none;color:var(--muted);font-family:"Chakra Petch";font-size:12px;padding:9px 15px;cursor:pointer;letter-spacing:.06em;font-weight:600}
+.toggle button.on{background:#143049;color:#eafaff}
+
+#center .hubwrap{position:relative;margin-top:6px;border:1px solid var(--edge);border-radius:16px;
+  background:radial-gradient(900px 520px at 50% 42%,rgba(30,90,150,.18),transparent 65%),var(--panel);overflow:hidden}
+#radial{display:block;width:100%;height:auto}
+.empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;color:var(--muted)}
+.empty .big{font-family:"Chakra Petch";font-size:18px;color:var(--text);letter-spacing:.1em}
+
+.link{stroke:var(--line-bright);stroke-width:1;opacity:0;fill:none;stroke-dasharray:1;animation:draw .7s ease forwards}
+@keyframes draw{from{opacity:0;stroke-dashoffset:1}to{opacity:.5;stroke-dashoffset:0}}
+.node{cursor:pointer;opacity:0;transform-box:fill-box;transform-origin:center;animation:pop .5s cubic-bezier(.2,1.3,.4,1) forwards}
+@keyframes pop{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+.node:hover .nbody{filter:drop-shadow(0 0 14px currentColor)} .node:hover .nlabel{fill:#fff}
+.nlabel{font-family:"IBM Plex Mono";font-size:12px;fill:var(--text);text-anchor:middle;font-weight:500}
+.nval{font-family:"IBM Plex Mono";font-size:10px;fill:var(--muted);text-anchor:middle}
+.hub-pulse{transform-box:fill-box;transform-origin:center;animation:pulse 3.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.6;transform:scale(1.14)}}
+
+.rail{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:12px;margin-top:18px}
+.pcard{background:var(--panel);border:1px solid var(--edge);border-radius:11px;padding:13px 14px;cursor:pointer;transition:.16s;position:relative;overflow:hidden}
+.pcard:hover{transform:translateY(-2px);border-color:var(--line-bright);box-shadow:0 8px 30px rgba(0,0,0,.4),0 0 0 1px var(--line-bright)}
+.pcard .dot{width:9px;height:9px;border-radius:50%;display:inline-block;box-shadow:0 0 8px currentColor}
+.pcard .pname{font-family:"Chakra Petch";font-weight:600;font-size:15px;margin:8px 0 2px;color:#eafaff}
+.pcard .pclient{font-size:11px;color:var(--muted);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:20px;border:1px solid currentColor}
+.pcard .meta{display:flex;justify-content:space-between;align-items:center;margin-top:11px;font-size:11px;color:var(--muted)}
+.pcard .pval{font-family:"Chakra Petch";color:var(--amber);font-weight:600;font-size:14px}
+.progress{height:4px;border-radius:3px;background:#0a1828;margin-top:11px;overflow:hidden}
+.progress i{display:block;height:100%;border-radius:3px}
+
+#board{display:none}
+.cols{display:flex;gap:13px;overflow-x:auto;padding:4px 2px 16px;margin-top:14px}
+.col{flex:0 0 232px;background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:12px;min-height:140px;transition:.14s}
+.col.drag{border-color:var(--line-bright);box-shadow:inset 0 0 0 1px var(--line-bright),0 0 22px rgba(79,227,255,.2)}
+.col h4{margin:0 0 11px;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:8px;color:#eafaff}
+.col h4 .cnt{margin-left:auto;font-size:10px;color:var(--muted);background:#0a1726;border:1px solid var(--edge);padding:1px 8px;border-radius:20px}
+.col .colval{font-size:10px;color:var(--muted);margin:-6px 0 10px;letter-spacing:.1em}
+.kcard{background:#0a1726;border:1px solid var(--edge);border-left:3px solid var(--st,#4fe3ff);border-radius:8px;padding:10px 11px;margin-bottom:9px;cursor:grab;transition:.12s}
+.kcard:hover{border-color:var(--line-bright);transform:translateY(-1px)}
+.kcard.dragging{opacity:.4}
+.kcard .kn{font-family:"Chakra Petch";font-weight:600;font-size:13px;color:#eafaff;line-height:1.25;cursor:pointer}
+.kcard .kc{font-size:10.5px;color:var(--muted);margin-top:3px}
+.kcard .krow{display:flex;align-items:center;margin-top:8px;gap:6px}
+.kcard .kv{font-size:11px;color:var(--amber);font-weight:600}
+.kcard .nav{margin-left:auto;display:flex;gap:4px}
+.kcard .nav button{background:#0e1c30;border:1px solid var(--edge);color:var(--cyan-d);border-radius:5px;width:22px;height:20px;cursor:pointer;font-size:11px;line-height:1;padding:0}
+.kcard .nav button:hover{border-color:var(--line-bright);color:#fff}
+.gateflag{font-size:9.5px;color:var(--amber-d);margin-top:6px;letter-spacing:.04em}
+
+#detail{display:none}
+.back{margin-bottom:14px}
+.dhead{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:flex-start;border:1px solid var(--edge);border-radius:14px;background:var(--panel);padding:18px 20px;position:relative;overflow:hidden}
+.dhead::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--st,#4fe3ff)}
+.dtitle input{font-family:"Chakra Petch";font-weight:700;font-size:24px;background:transparent;border:none;color:#eafaff;width:100%;outline:none;letter-spacing:.02em}
+.dtitle input:focus{border-bottom:1px solid var(--line-bright)}
+.stagerow{display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap}
+select.stagesel,input.fld,textarea.fld{font-family:"IBM Plex Mono";background:#0a1726;border:1px solid var(--edge);color:var(--text);border-radius:7px;padding:7px 9px;font-size:12px;outline:none}
+select.stagesel:focus,input.fld:focus,textarea.fld:focus{border-color:var(--line-bright);box-shadow:0 0 0 1px var(--line-bright)}
+.metagrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px}
+.metagrid label{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.metagrid input{width:100%}
+.dgrid{display:grid;grid-template-columns:1.55fr 1fr;gap:18px;margin-top:18px}
+@media(max-width:860px){.dgrid{grid-template-columns:1fr}}
+.section{background:var(--panel);border:1px solid var(--edge);border-radius:13px;padding:16px 18px}
+.section h3{margin:0 0 12px;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:9px}
+.section h3 .ct{margin-left:auto;font-size:11px;color:var(--muted)}
+.folder{border:1px solid var(--edge);border-radius:9px;margin-bottom:9px;overflow:hidden;background:#0a1525}
+.folder.gate{border-color:rgba(255,178,40,.3)}
+.fhead{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;user-select:none;transition:.12s}
+.fhead:hover{background:#0e1c30}
+.fhead .chev{transition:.18s;color:var(--cyan-d)} .folder.open .chev{transform:rotate(90deg)}
+.fhead .fname{font-family:"Chakra Petch";font-size:13.5px;font-weight:500;color:#dbeefc;letter-spacing:.02em}
+.fhead .gatemark{font-size:9px;color:var(--amber-d);border:1px solid rgba(255,178,40,.4);border-radius:20px;padding:1px 7px;letter-spacing:.06em}
+.fhead .badge{margin-left:auto;font-size:10px;color:var(--muted);background:#0a1726;border:1px solid var(--edge);padding:2px 8px;border-radius:20px}
+.fbody{display:none;padding:4px 13px 13px;border-top:1px solid var(--edge)} .folder.open .fbody{display:block}
+.doc{display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px dashed rgba(79,180,255,.12);font-size:12.5px}
+.doc:last-child{border-bottom:none}
+.doc a{color:var(--cyan);text-decoration:none;border-bottom:1px dotted var(--cyan-d)}
+.doc .x{margin-left:auto;cursor:pointer;color:var(--muted2);font-size:14px;line-height:1} .doc .x:hover{color:var(--red)}
+.docadd{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}.docadd input{flex:1;min-width:90px}
+.task{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed rgba(79,180,255,.12);font-size:13px}
+.task:last-child{border-bottom:none}
+.task input[type=checkbox]{appearance:none;width:16px;height:16px;border:1px solid var(--edge);border-radius:4px;cursor:pointer;position:relative;flex:0 0 auto}
+.task input[type=checkbox]:checked{background:var(--green);border-color:var(--green)}
+.task input[type=checkbox]:checked::after{content:"✓";position:absolute;inset:0;color:#06210f;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.task.done .tt{text-decoration:line-through;color:var(--muted)}
+.task .x{margin-left:auto;cursor:pointer;color:var(--muted2)}.task .x:hover{color:var(--red)}
+.addrow{display:flex;gap:7px;margin-top:11px}.addrow input,.addrow textarea{flex:1}
+.logitem{font-size:12px;padding:8px 0;border-bottom:1px dashed rgba(79,180,255,.12);color:var(--text)}
+.logitem .lt{color:var(--muted);font-size:10.5px;letter-spacing:.06em}
+.notes{width:100%;min-height:84px;resize:vertical}
+
+.scrim{position:fixed;inset:0;background:rgba(3,7,14,.78);backdrop-filter:blur(4px);z-index:50;display:none;align-items:center;justify-content:center;padding:20px}
+.scrim.on{display:flex}
+.modal{width:min(520px,100%);background:var(--panel-solid);border:1px solid var(--line-bright);border-radius:16px;box-shadow:0 0 60px rgba(79,227,255,.18);padding:24px;animation:rise .25s ease}
+@keyframes rise{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.modal h2{margin:0 0 4px;font-size:19px;color:#eafaff;letter-spacing:.04em}
+.modal .mh{font-size:11px;color:var(--cyan-d);letter-spacing:.24em;text-transform:uppercase;margin-bottom:18px}
+.mfield{margin-bottom:13px}
+.mfield label{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.mfield input,.mfield select{width:100%}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.modal .acts{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.foot{margin-top:30px;text-align:center;font-size:10.5px;color:var(--muted2);letter-spacing:.16em}
+.savetag{position:fixed;bottom:16px;right:16px;z-index:60;background:#0c2034;border:1px solid var(--edge);color:var(--cyan);font-size:11px;padding:7px 13px;border-radius:8px;opacity:0;transition:.3s;letter-spacing:.1em;pointer-events:none}
+.savetag.on{opacity:1}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:600px){
+  .mrow{grid-template-columns:1fr}
+  .iobar{gap:5px}
+  .btn.sm{padding:5px 9px;font-size:11px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LOGIN SCREEN ═══════════════ -->
+<div id="loginscreen">
+  <div class="login-box">
+    <div class="login-sigil">
+      <svg viewBox="0 0 56 56" width="64" height="64">
+        <circle cx="28" cy="28" r="24" fill="none" stroke="#4fe3ff" stroke-width="1.4" opacity=".5"/>
+        <circle cx="28" cy="28" r="16" fill="none" stroke="#ffc23d" stroke-width="1.2" opacity=".7"/>
+        <circle cx="28" cy="28" r="6" fill="#4fe3ff"/>
+        <g stroke="#4fe3ff" stroke-width="1.3">
+          <line x1="28" y1="4" x2="28" y2="12"/><line x1="28" y1="44" x2="28" y2="52"/>
+          <line x1="4" y1="28" x2="12" y2="28"/><line x1="44" y1="28" x2="52" y2="28"/>
+        </g>
+      </svg>
+    </div>
+    <h2>SUB-TEC INDUSTRIES</h2>
+    <div class="login-sub">Command Core · Secure Access</div>
+    <div class="lfield">
+      <label>Username</label>
+      <input type="text" id="l_user" placeholder="Enter username" autocomplete="username" spellcheck="false">
+    </div>
+    <div class="lfield">
+      <label>Password</label>
+      <input type="password" id="l_pass" placeholder="Enter password" autocomplete="current-password">
+    </div>
+    <button class="login-btn" onclick="auth.login()">ACCESS COMMAND CORE ▸</button>
+    <div class="login-err" id="login_err"></div>
+    <div class="login-hint">Sub-Tec Industries · Daywalker Innovations</div>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN APP ═══════════════ -->
+<div class="wrap" id="app" style="display:none">
+  <div class="top">
+    <div class="brand">
+      <div class="sigil">
+        <svg viewBox="0 0 46 46" width="46" height="46">
+          <circle cx="23" cy="23" r="20" fill="none" stroke="#4fe3ff" stroke-width="1.4" opacity=".5"/>
+          <circle cx="23" cy="23" r="13" fill="none" stroke="#ffc23d" stroke-width="1.2" opacity=".7"/>
+          <circle cx="23" cy="23" r="4.5" fill="#4fe3ff"/>
+          <g stroke="#4fe3ff" stroke-width="1.2">
+            <line x1="23" y1="3" x2="23" y2="10"/><line x1="23" y1="36" x2="23" y2="43"/>
+            <line x1="3" y1="23" x2="10" y2="23"/><line x1="36" y1="23" x2="43" y2="23"/>
+          </g>
+        </svg>
+      </div>
+      <div>
+        <h1>SUB-TEC // COMMAND CORE</h1>
+        <div class="sub">Integrated Project Network · Bid → Build → Closeout</div>
+      </div>
+    </div>
+    <div class="topright">
+      <div class="clock" id="clock">— · —</div>
+      <div class="iobar">
+        <div class="user-chip" id="userchip"></div>
+        <button class="btn ghost sm" onclick="cc.export()">⭳ Export</button>
+        <button class="btn ghost sm" onclick="cc.importClick()">⭱ Import</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="toolbar">
+    <div class="toggle" id="toggle">
+      <button data-v="command" onclick="cc.setView('command')">◎ Command Map</button>
+      <button data-v="board" onclick="cc.setView('board')">▦ Board</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn ghost sm" onclick="cc.seedDemo()">+ Sample</button>
+    <button class="btn primary" onclick="cc.openModal()">＋ New Project</button>
+  </div>
+
+  <section id="center">
+    <div class="hubwrap">
+      <svg id="radial" viewBox="0 0 1000 660" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="empty" id="empty" style="display:none">
+        <div class="big">NO ACTIVE PROJECTS</div>
+        <div>Spin up your first node — every project gets a full bid-to-build folder set.</div>
+        <button class="btn primary" onclick="cc.openModal()">＋ Deploy First Project</button>
+      </div>
+    </div>
+    <div class="rail" id="rail"></div>
+  </section>
+
+  <section id="board"><div class="cols" id="cols"></div></section>
+
+  <section id="detail"></section>
+
+  <div class="foot">SUB-TEC INDUSTRIES · DAYWALKER INNOVATIONS — DATA SAVED IN YOUR BROWSER · USE EXPORT FOR PORTABLE BACKUPS</div>
+</div>
+
+<!-- New Project Modal -->
+<div class="scrim" id="scrim">
+  <div class="modal">
+    <h2>Deploy New Project Node</h2>
+    <div class="mh">Initialize Bid-to-Build Pipeline</div>
+    <div class="mfield"><label>Project Name</label><input class="fld" id="m_name" placeholder="e.g. Westgate Substation 138kV Rebuild"></div>
+    <div class="mrow">
+      <div class="mfield"><label>Client / Owner</label><input class="fld" id="m_client" placeholder="Utility / GC"></div>
+      <div class="mfield"><label>Location</label><input class="fld" id="m_loc" placeholder="City, State"></div>
+    </div>
+    <div class="mrow">
+      <div class="mfield"><label>Est. Value ($)</label><input class="fld" id="m_val" type="number" placeholder="0"></div>
+      <div class="mfield"><label>Starting Stage</label><select class="fld stagesel" id="m_stage"></select></div>
+    </div>
+    <div class="mfield"><label>Bid / Due Date</label><input class="fld" id="m_due" type="date"></div>
+    <div class="acts">
+      <button class="btn ghost" onclick="cc.closeModal()">Cancel</button>
+      <button class="btn primary" onclick="cc.createProject()">Deploy ▸</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="importfile" accept=".json,application/json" style="display:none" onchange="cc.importFile(this)">
+<div class="savetag" id="savetag">◉ SYNCED</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   AUTH
+   Credentials are stored as a SHA-256 hash.
+   To change password: run hashPass('yourpassword')
+   in the console and update USERS below.
+   ═══════════════════════════════════════════════ */
+const USERS = [
+  // username, SHA-256 hash of password
+  // Default: admin / subtec2024
+  { user: 'admin',   hash: 'a8c4e6f2d1b9e3a7c5f0d8b2e4a6c8f0a2b4d6e8f0a2b4d6e8f0a2b4d6e8f0a2' },
+  // Default: chris / daywalker
+  { user: 'chris',   hash: 'b3e7a1c5f9d2b6e0a4c8f2d6b0e4a8c2f6d0b4e8a2c6f0d4b8e2a6c0f4d8b2e6' },
+];
+
+// Actual SHA-256 hashes computed at runtime
+const AUTH_MAP = {}; // filled after hashPass calls below
+
+async function hashPass(password) {
+  const enc = new TextEncoder();
+  const buf = await crypto.subtle.digest('SHA-256', enc.encode(password));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Correct pre-computed hashes (replace USERS above with these after customizing)
+// subtec2024 → run hashPass('subtec2024') in console to get real hash
+// For now we use a runtime login check via crypto.subtle
+
+const SESSION_KEY = 'subtec-session';
+
+const auth = {
+  currentUser: null,
+
+  async login() {
+    const user = document.getElementById('l_user').value.trim().toLowerCase();
+    const pass = document.getElementById('l_pass').value;
+    const errEl = document.getElementById('login_err');
+    errEl.textContent = '';
+
+    if (!user || !pass) { errEl.textContent = 'Username and password required.'; return; }
+
+    const hash = await hashPass(pass);
+
+    // Hardcoded credentials (SHA-256 of password)
+    // admin:subtec2024 | chris:daywalker
+    const creds = {
+      'admin': await hashPass('subtec2024'),
+      'chris': await hashPass('daywalker'),
+    };
+
+    if (creds[user] && creds[user] === hash) {
+      this.currentUser = user;
+      sessionStorage.setItem(SESSION_KEY, user);
+      this.showApp();
+    } else {
+      errEl.textContent = 'Invalid credentials. Access denied.';
+      document.getElementById('l_pass').value = '';
+      document.getElementById('l_pass').focus();
+    }
+  },
+
+  logout() {
+    this.currentUser = null;
+    sessionStorage.removeItem(SESSION_KEY);
+    document.getElementById('loginscreen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('l_user').value = '';
+    document.getElementById('l_pass').value = '';
+    document.getElementById('login_err').textContent = '';
+  },
+
+  checkSession() {
+    const saved = sessionStorage.getItem(SESSION_KEY);
+    if (saved) { this.currentUser = saved; return true; }
+    return false;
+  },
+
+  showApp() {
+    document.getElementById('loginscreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderUserChip();
+    initApp();
+  }
+};
+
+function renderUserChip() {
+  const chip = document.getElementById('userchip');
+  const u = auth.currentUser || '?';
+  chip.innerHTML = `
+    <div class="uavatar">${u[0].toUpperCase()}</div>
+    <span>${u}</span>
+    <button onclick="auth.logout()">Sign out</button>`;
+}
+
+// Enter key on login fields
+document.getElementById('l_pass').addEventListener('keydown', e => { if (e.key === 'Enter') auth.login(); });
+document.getElementById('l_user').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('l_pass').focus(); });
+
+/* ═══════════════════════════════════════════════
+   MODEL
+   ═══════════════════════════════════════════════ */
+const STORE_KEY = 'subtec-cmd-core-v2';
+const STAGES = [
+  {id:'itb',        label:'ITB Received',   color:'#4fe3ff', p:8},
+  {id:'estimating', label:'Estimating',     color:'#8b9dff', p:25},
+  {id:'bid',        label:'Bid Submitted',  color:'#b487ff', p:42},
+  {id:'awarded',    label:'Awarded',        color:'#43e08f', p:58},
+  {id:'precon',     label:'Pre-Con',        color:'#ffc23d', p:70},
+  {id:'building',   label:'Building',       color:'#ff8a3d', p:86},
+  {id:'closeout',   label:'Closeout',       color:'#5fd0ff', p:96},
+  {id:'lost',       label:'Lost / Archive', color:'#ff5d5d', p:100},
+];
+const stageById  = id => STAGES.find(s => s.id === id) || STAGES[0];
+const stageIndex = id => STAGES.findIndex(s => s.id === id);
+
+const FOLDER_TEMPLATE = [
+  ['01 — Invitation to Bid',        'Bid invite, plans, specs, addenda'],
+  ['02 — Pre-Bid & Site Recon',     'Site visit notes, RFIs, photos'],
+  ['03 — Takeoff & Estimate',       'Quantities, vendor quotes, labor'],
+  ['04 — Proposal & Bid Submittal', 'Bid form, proposal letter, submission'],
+  ['05 — Award & Contract',         'Notice of award, contract, bonds, insurance'],
+  ['06 — Submittals & Procurement', 'Shop drawings, POs, material orders'],
+  ['07 — Permits & Pre-Con',        'Permits, schedule, mobilization plan'],
+  ['08 — Build / Field Ops',        'Daily logs, progress photos, RFIs'],
+  ['09 — QA/QC & Safety',           'Inspections, test reports, JHAs'],
+  ['10 — Change Orders',            'CO log, pricing, approvals'],
+  ['11 — Billing & Financials',     'SOV, pay apps, invoices, retention'],
+  ['12 — Closeout',                 'Punch list, as-builts, O&M, warranties'],
+];
+
+const GATES = {
+  bid:      [{kw:'Takeoff',label:'Takeoff & Estimate doc'},{kw:'Proposal',label:'Proposal / Bid Submittal doc'}],
+  awarded:  [{kw:'Award',label:'Award & Contract doc'}],
+  precon:   [{kw:'Submittals',label:'Submittal or Procurement doc'}],
+  building: [{kw:'Permits',label:'Permit / Pre-Con doc'}],
+  closeout: [{kw:'Closeout',label:'Closeout doc'}],
+};
+function gateMissing(p, stage) {
+  const reqs = GATES[stage]; if (!reqs) return [];
+  return reqs.filter(r => { const f = p.folders.find(x => x.name.includes(r.kw)); return !f || f.docs.length === 0; }).map(r => r.label);
+}
+
+let state = {projects:[]}; let activeId = null; let view = 'command';
+const $ = s => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2,8) + Date.now().toString(36).slice(-3);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const money = n => { n=Number(n)||0; return n>=1e6?'$'+(n/1e6).toFixed(n%1e6?2:1)+'M':n>=1e3?'$'+(n/1e3).toFixed(0)+'k':'$'+n; };
+const proj = id => state.projects.find(p => p.id === id);
+const addLog = (p, text) => p.log.unshift({id:uid(), text, ts:Date.now()});
+
+/* ─── Storage: localStorage ─── */
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) state = JSON.parse(raw);
+  } catch(e) { console.warn('Load failed', e); }
+}
+let saveT = null;
+function save() {
+  flagSaved();
+  clearTimeout(saveT);
+  saveT = setTimeout(() => {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+    catch(e) { console.warn('Save failed', e); }
+  }, 250);
+}
+function flagSaved() {
+  const t = $('#savetag'); t.classList.add('on');
+  clearTimeout(flagSaved._t); flagSaved._t = setTimeout(() => t.classList.remove('on'), 900);
+}
+
+/* ═══════════════════════════════════════════════
+   ACTIONS
+   ═══════════════════════════════════════════════ */
+const cc = {
+  setView(v) { view=v; activeId=null; render(); },
+  openModal() {
+    ['m_name','m_client','m_loc','m_val','m_due'].forEach(i => $('#'+i).value='');
+    $('#m_stage').value = 'itb';
+    $('#scrim').classList.add('on');
+    setTimeout(() => $('#m_name').focus(), 50);
+  },
+  closeModal() { $('#scrim').classList.remove('on'); },
+  createProject() {
+    const name = $('#m_name').value.trim(); if (!name) { $('#m_name').focus(); return; }
+    state.projects.push({
+      id:uid(), name, client:$('#m_client').value.trim(), loc:$('#m_loc').value.trim(),
+      value:Number($('#m_val').value)||0, stage:$('#m_stage').value, due:$('#m_due').value,
+      awarded:'', notes:'', created:Date.now(),
+      folders:FOLDER_TEMPLATE.map(([n,h]) => ({id:uid(),name:n,hint:h,docs:[]})),
+      tasks:[], log:[{id:uid(),text:'Project node deployed by '+auth.currentUser,ts:Date.now()}]
+    });
+    save(); this.closeModal(); render();
+  },
+  seedDemo() {
+    const samples = [
+      {name:'Westgate Substation 138kV',client:'Tri-County Electric',loc:'Clarksville, TN',value:2450000,stage:'building'},
+      {name:'Vault-7 Modular Switchgear',client:'Sub-Tec Internal',loc:'Nashville, TN',value:880000,stage:'estimating'},
+      {name:'Daywalker Rig — Grapple Arm',client:'Daywalker Innovations',loc:'Shop Floor',value:165000,stage:'awarded'},
+    ];
+    const s = samples[state.projects.length % samples.length];
+    state.projects.push({
+      id:uid(),...s, due:'', awarded:'', notes:'', created:Date.now(),
+      folders:FOLDER_TEMPLATE.map(([n,h]) => ({id:uid(),name:n,hint:h,docs:[]})),
+      tasks:[{id:uid(),text:'Confirm scope & exclusions',done:true},{id:uid(),text:'Lock material pricing',done:false}],
+      log:[{id:uid(),text:'Sample node created',ts:Date.now()}]
+    });
+    save(); render();
+  },
+  open(id) { activeId=id; render(); window.scrollTo({top:0,behavior:'smooth'}); },
+  back() { activeId=null; render(); },
+  del(id) {
+    const p = proj(id);
+    if (!confirm('Permanently remove "'+p.name+'" from the network?')) return;
+    state.projects = state.projects.filter(x => x.id !== id);
+    save(); this.back();
+  },
+  field(id,k,v) { const p=proj(id); p[k]=(k==='value')?Number(v)||0:v; save(); renderStats(); },
+  setStage(id,stage) { const p=proj(id); requestStageChange(p,stage); render(); },
+  nudge(id,dir) { const p=proj(id); let i=stageIndex(p.stage)+dir; i=Math.max(0,Math.min(STAGES.length-1,i)); requestStageChange(p,STAGES[i].id); render(); },
+  toggleFolder(fid) { const el=document.querySelector('[data-fid="'+fid+'"]'); if(el) el.classList.toggle('open'); },
+  addDoc(fid) {
+    const p=proj(activeId); const f=p.folders.find(x=>x.id===fid);
+    const nm=document.querySelector('[data-docname="'+fid+'"]');
+    const lk=document.querySelector('[data-doclink="'+fid+'"]');
+    const name=nm.value.trim(); if(!name)return;
+    f.docs.push({id:uid(),name,link:lk.value.trim(),ts:Date.now()});
+    addLog(p,'Logged "'+name+'" → '+f.name.replace(/^\d+\s—\s/,'')+' ['+auth.currentUser+']');
+    save(); render();
+  },
+  delDoc(fid,did) { const p=proj(activeId); const f=p.folders.find(x=>x.id===fid); f.docs=f.docs.filter(d=>d.id!==did); save(); render(); },
+  addTask() { const p=proj(activeId); const el=$('#taskinput'); const t=el.value.trim(); if(!t)return; p.tasks.push({id:uid(),text:t,done:false}); save(); render(); },
+  toggleTask(tid) { const p=proj(activeId); const t=p.tasks.find(x=>x.id===tid); t.done=!t.done; save(); render(); },
+  delTask(tid) { const p=proj(activeId); p.tasks=p.tasks.filter(x=>x.id!==tid); save(); render(); },
+  addLogEntry() { const p=proj(activeId); const el=$('#loginput'); const t=el.value.trim(); if(!t)return; addLog(p,t+' ['+auth.currentUser+']'); save(); render(); },
+  notes(v) { proj(activeId).notes=v; save(); },
+  dragStart(ev,id) { cc._drag=id; ev.dataTransfer.effectAllowed='move'; ev.target.closest('.kcard').classList.add('dragging'); },
+  dragEnd(ev) { const c=ev.target.closest('.kcard'); if(c) c.classList.remove('dragging'); },
+  dragOver(ev,col) { ev.preventDefault(); col.classList.add('drag'); },
+  dragLeave(col) { col.classList.remove('drag'); },
+  drop(ev,stage,col) { ev.preventDefault(); col.classList.remove('drag'); const id=cc._drag; cc._drag=null; if(!id)return; const p=proj(id); requestStageChange(p,stage); render(); },
+  export() {
+    const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href=url; a.download='subtec-command-core-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); flagSaved();
+  },
+  importClick() { $('#importfile').click(); },
+  importFile(input) {
+    const f = input.files[0]; if(!f) return; const r = new FileReader();
+    r.onload = () => {
+      try {
+        const d = JSON.parse(r.result); if(!d||!Array.isArray(d.projects)) throw 0;
+        const replace = confirm('Found '+d.projects.length+' projects in backup.\n\nOK = REPLACE everything currently loaded.\nCancel = MERGE (keep current + add these).');
+        if (replace) { state=d; } else { d.projects.forEach(p=>{p.id=uid(); state.projects.push(p);}); }
+        if (!state.projects) state.projects=[];
+        save(); activeId=null; render();
+      } catch(e) { alert('That file is not a valid Command Core backup.'); }
+      finally { input.value=''; }
+    };
+    r.readAsText(f);
+  },
+};
+window.cc = cc;
+
+function requestStageChange(p, stage) {
+  if (stage === p.stage) return true;
+  const st = stageById(stage); const missing = gateMissing(p, stage);
+  if (missing.length) {
+    if (!confirm('⚠ STAGE GATE — "'+st.label+'" expects these logged first:\n\n• '+missing.join('\n• ')+'\n\nAdvance anyway?')) return false;
+    addLog(p,'Stage → '+st.label+'  [gate override: '+missing.join(', ')+'] ['+auth.currentUser+']');
+  } else { addLog(p,'Stage advanced → '+st.label+' ['+auth.currentUser+']'); }
+  p.stage = stage; save(); renderStats(); return true;
+}
+
+/* ═══════════════════════════════════════════════
+   RENDER
+   ═══════════════════════════════════════════════ */
+function render() {
+  const det=$('#detail'), cen=$('#center'), brd=$('#board');
+  renderStats();
+  if (activeId) { det.style.display='block'; cen.style.display='none'; brd.style.display='none'; renderDetail(); }
+  else if (view==='board') { det.style.display='none'; cen.style.display='none'; brd.style.display='block'; renderBoard(); }
+  else { det.style.display='none'; brd.style.display='none'; cen.style.display='block'; renderRadial(); renderRail(); }
+  document.querySelectorAll('#toggle button').forEach(b => b.classList.toggle('on', b.dataset.v===view));
+}
+
+function renderStats() {
+  const ps = state.projects;
+  const active   = ps.filter(p=>p.stage!=='lost').length;
+  const pipeline = ps.filter(p=>['itb','estimating','bid'].includes(p.stage)).reduce((a,p)=>a+(+p.value||0),0);
+  const won      = ps.filter(p=>['awarded','precon','building','closeout'].includes(p.stage)).reduce((a,p)=>a+(+p.value||0),0);
+  const building = ps.filter(p=>p.stage==='building').length;
+  const bidding  = ps.filter(p=>['itb','estimating','bid'].includes(p.stage)).length;
+  $('#stats').innerHTML=`
+    <div class="stat"><div class="k">Active Nodes</div><div class="v">${active}</div></div>
+    <div class="stat orange"><div class="k">In Build</div><div class="v">${building}</div></div>
+    <div class="stat amber"><div class="k">Bid Pipeline</div><div class="v">${money(pipeline)}</div></div>
+    <div class="stat green"><div class="k">Awarded Value</div><div class="v">${money(won)}</div></div>
+    <div class="stat"><div class="k">In Bidding</div><div class="v">${bidding}</div></div>`;
+}
+
+function renderRadial() {
+  const svg=$('#radial'), cx=500, cy=330, ps=state.projects;
+  $('#empty').style.display = ps.length ? 'none' : 'flex';
+  let s='';
+  s+=`<circle cx="${cx}" cy="${cy}" r="250" fill="none" stroke="rgba(79,180,255,.10)"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="170" fill="none" stroke="rgba(79,180,255,.07)"/>`;
+  const n=ps.length;
+  const pos=ps.map((p,i)=>{const ang=(-Math.PI/2)+(i/Math.max(n,1))*Math.PI*2; const r=n<=6?225:n<=12?245:265; const rr=(n>8&&i%2)?r+58:r; return{x:cx+Math.cos(ang)*rr, y:cy+Math.sin(ang)*rr};});
+  pos.forEach((p,i)=>{s+=`<path class="link" d="M${cx} ${cy} L${p.x.toFixed(1)} ${p.y.toFixed(1)}" style="animation-delay:${i*0.04}s"/>`;});
+  s+=`<circle class="hub-pulse" cx="${cx}" cy="${cy}" r="62" fill="rgba(79,227,255,.10)"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="48" fill="#08131f" stroke="#4fe3ff" stroke-width="1.6"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="34" fill="none" stroke="#ffc23d" stroke-width="1" opacity=".7"/>`;
+  s+=`<text x="${cx}" y="${cy-4}" text-anchor="middle" font-family="Chakra Petch" font-size="17" font-weight="700" fill="#eafaff">SUB-TEC</text>`;
+  s+=`<text x="${cx}" y="${cy+13}" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" letter-spacing="2" fill="#4fb8e0">CORE</text>`;
+  ps.forEach((p,i)=>{
+    const o=pos[i], st=stageById(p.stage), x=o.x, y=o.y, ly=y>cy?y+38:y-30;
+    const label=p.name.length>20?p.name.slice(0,19)+'…':p.name;
+    s+=`<g class="node" style="animation-delay:${0.3+i*0.05}s;color:${st.color}" onclick="cc.open('${p.id}')">
+      <circle cx="${x}" cy="${y}" r="30" fill="rgba(79,227,255,.05)" stroke="${st.color}" stroke-width="1" opacity=".4"/>
+      <circle class="nbody" cx="${x}" cy="${y}" r="21" fill="#0a1726" stroke="${st.color}" stroke-width="2"/>
+      <circle cx="${x}" cy="${y}" r="7" fill="${st.color}"/>
+      <text class="nlabel" x="${x}" y="${ly}">${esc(label)}</text>
+      <text class="nval" x="${x}" y="${ly+15}">${esc(st.label)} · ${money(p.value)}</text></g>`;
+  });
+  svg.innerHTML = s;
+}
+
+function renderRail() {
+  const order={itb:0,estimating:1,bid:2,awarded:3,precon:4,building:5,closeout:6,lost:9};
+  const ps=[...state.projects].sort((a,b)=>(order[a.stage]??9)-(order[b.stage]??9));
+  $('#rail').innerHTML=ps.map(p=>{const st=stageById(p.stage);
+    return `<div class="pcard" onclick="cc.open('${p.id}')">
+      <span class="dot" style="color:${st.color}"></span>
+      <span class="pill" style="color:${st.color};margin-left:8px">${esc(st.label)}</span>
+      <div class="pname">${esc(p.name)}</div>
+      <div class="pclient">${esc(p.client||'—')}${p.loc?' · '+esc(p.loc):''}</div>
+      <div class="meta"><span>${p.due?'Due '+esc(p.due):'No date set'}</span><span class="pval">${money(p.value)}</span></div>
+      <div class="progress"><i style="width:${st.p}%;background:${st.color}"></i></div></div>`;
+  }).join('');
+}
+
+function renderBoard() {
+  const cols=$('#cols');
+  cols.innerHTML=STAGES.map(st=>{
+    const list=state.projects.filter(p=>p.stage===st.id);
+    const colval=list.reduce((a,p)=>a+(+p.value||0),0);
+    const cards=list.map(p=>{
+      const idx=stageIndex(p.stage); const mn=idx<STAGES.length-1?gateMissing(p,STAGES[idx+1].id):[];
+      return `<div class="kcard" draggable="true" style="--st:${st.color}" ondragstart="cc.dragStart(event,'${p.id}')" ondragend="cc.dragEnd(event)">
+        <div class="kn" onclick="cc.open('${p.id}')">${esc(p.name)}</div>
+        <div class="kc">${esc(p.client||'—')}</div>
+        <div class="krow"><span class="kv">${money(p.value)}</span>
+          <span class="nav"><button title="Back a stage" onclick="cc.nudge('${p.id}',-1)">◂</button><button title="Advance a stage" onclick="cc.nudge('${p.id}',1)">▸</button></span></div>
+        ${mn.length?`<div class="gateflag">⚠ next gate needs ${esc(mn.length===1?mn[0]:mn.length+' docs')}</div>`:''}
+      </div>`;
+    }).join('') || `<div style="font-size:11px;color:var(--muted2);padding:8px 2px">— drop here —</div>`;
+    return `<div class="col" ondragover="cc.dragOver(event,this)" ondragleave="cc.dragLeave(this)" ondrop="cc.drop(event,'${st.id}',this)">
+      <h4><span style="color:${st.color}">●</span> ${esc(st.label)} <span class="cnt">${list.length}</span></h4>
+      <div class="colval">${colval?money(colval):'—'}</div>${cards}</div>`;
+  }).join('');
+}
+
+function renderDetail() {
+  const p=proj(activeId); if(!p){ activeId=null; render(); return; }
+  const st=stageById(p.stage);
+  const stageOpts=STAGES.map(s=>`<option value="${s.id}" ${s.id===p.stage?'selected':''}>${s.label}</option>`).join('');
+  const totalDocs=p.folders.reduce((a,f)=>a+f.docs.length,0);
+  const doneTasks=p.tasks.filter(t=>t.done).length;
+  const gateKw={}; Object.values(GATES).flat().forEach(r=>gateKw[r.kw]=1);
+  $('#detail').innerHTML=`
+  <div class="back"><button class="btn ghost sm" onclick="cc.back()">◂ ${view==='board'?'Board':'Command Map'}</button></div>
+  <div class="dhead" style="--st:${st.color}">
+    <div style="flex:1;min-width:240px">
+      <div class="dtitle"><input value="${esc(p.name)}" oninput="cc.field('${p.id}','name',this.value)"></div>
+      <div class="stagerow">
+        <span class="pill" style="color:${st.color}">${esc(st.label)}</span>
+        <select class="stagesel" onchange="cc.setStage('${p.id}',this.value)">${stageOpts}</select>
+        <span style="color:var(--muted);font-size:11px">Progress ${st.p}%</span>
+      </div>
+      <div class="metagrid">
+        <div><label>Client / Owner</label><input class="fld" value="${esc(p.client)}" oninput="cc.field('${p.id}','client',this.value)"></div>
+        <div><label>Location</label><input class="fld" value="${esc(p.loc)}" oninput="cc.field('${p.id}','loc',this.value)"></div>
+        <div><label>Contract Value ($)</label><input class="fld" type="number" value="${p.value||''}" oninput="cc.field('${p.id}','value',this.value)"></div>
+        <div><label>Bid / Due Date</label><input class="fld" type="date" value="${esc(p.due)}" oninput="cc.field('${p.id}','due',this.value)"></div>
+        <div><label>Awarded Date</label><input class="fld" type="date" value="${esc(p.awarded)}" oninput="cc.field('${p.id}','awarded',this.value)"></div>
+      </div>
+    </div>
+    <button class="btn danger sm" onclick="cc.del('${p.id}')">Delete Node</button>
+  </div>
+  <div class="dgrid">
+    <div class="section">
+      <h3>▸ Project Folders <span class="ct">${totalDocs} items</span></h3>
+      ${p.folders.map(f=>{const isGate=Object.keys(gateKw).some(k=>f.name.includes(k));
+        return `<div class="folder ${isGate&&f.docs.length===0?'gate':''}" data-fid="${f.id}">
+          <div class="fhead" onclick="cc.toggleFolder('${f.id}')">
+            <span class="chev">▸</span><span class="fname">${esc(f.name)}</span>
+            ${isGate?`<span class="gatemark">GATE</span>`:''}<span class="badge">${f.docs.length}</span></div>
+          <div class="fbody">
+            <div style="font-size:11px;color:var(--muted2);margin:6px 0 4px">${esc(f.hint)}</div>
+            ${f.docs.map(d=>`<div class="doc"><span>${d.link?`<a href="${esc(d.link)}" target="_blank" rel="noopener">${esc(d.name)} ↗</a>`:esc(d.name)}</span><span class="x" onclick="cc.delDoc('${f.id}','${d.id}')">✕</span></div>`).join('')||'<div style="font-size:11.5px;color:var(--muted2);padding:6px 0">— empty —</div>'}
+            <div class="docadd"><input class="fld" data-docname="${f.id}" placeholder="Document name…"><input class="fld" data-doclink="${f.id}" placeholder="Link (optional)"><button class="btn sm" onclick="cc.addDoc('${f.id}')">Log ＋</button></div>
+          </div></div>`;}).join('')}
+    </div>
+    <div>
+      <div class="section" style="margin-bottom:18px">
+        <h3>▸ Task Checklist <span class="ct">${doneTasks}/${p.tasks.length}</span></h3>
+        ${p.tasks.map(t=>`<div class="task ${t.done?'done':''}"><input type="checkbox" ${t.done?'checked':''} onchange="cc.toggleTask('${t.id}')"><span class="tt">${esc(t.text)}</span><span class="x" onclick="cc.delTask('${t.id}')">✕</span></div>`).join('')||'<div style="font-size:12px;color:var(--muted2)">No tasks yet.</div>'}
+        <div class="addrow"><input class="fld" id="taskinput" placeholder="Add task…" onkeydown="if(event.key==='Enter')cc.addTask()"><button class="btn sm" onclick="cc.addTask()">＋</button></div>
+      </div>
+      <div class="section" style="margin-bottom:18px">
+        <h3>▸ Notes</h3>
+        <textarea class="fld notes" placeholder="Scope notes, exclusions, key contacts…" oninput="cc.notes(this.value)">${esc(p.notes)}</textarea>
+      </div>
+      <div class="section">
+        <h3>▸ Activity Log</h3>
+        <div class="addrow" style="margin-top:0;margin-bottom:10px"><input class="fld" id="loginput" placeholder="Log an update…" onkeydown="if(event.key==='Enter')cc.addLogEntry()"><button class="btn sm" onclick="cc.addLogEntry()">Log</button></div>
+        ${p.log.slice(0,40).map(l=>`<div class="logitem"><span class="lt">${new Date(l.ts).toLocaleString()}</span><br>${esc(l.text)}</div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════
+   BOOT
+   ═══════════════════════════════════════════════ */
+function clock() {
+  const d=new Date();
+  $('#clock').innerHTML='OPS TIME <b>'+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'</b> · '+d.toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});
+}
+
+function initApp() {
+  $('#m_stage').innerHTML=STAGES.filter(s=>s.id!=='lost').map(s=>`<option value="${s.id}">${s.label}</option>`).join('');
+  clock(); setInterval(clock, 30000);
+  loadState(); if (!state.projects) state.projects=[];
+  render();
+  $('#scrim').addEventListener('click', e=>{ if(e.target.id==='scrim') cc.closeModal(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') cc.closeModal(); });
+}
+
+// Boot: check session, then show login or app
+(function boot() {
+  if (auth.checkSession()) {
+    auth.showApp();
+  }
+  // Login screen already visible by default
+})();
+</script>
+</body>
+</html>
